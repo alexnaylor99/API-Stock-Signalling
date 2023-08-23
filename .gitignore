@@ -3,3 +3,6 @@ venv/
 .env
 
 draft.py
+test.py
+
+__pycache__
