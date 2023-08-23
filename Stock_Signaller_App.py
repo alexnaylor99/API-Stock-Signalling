@@ -1,30 +1,37 @@
-# price drop url = https://maker.ifttt.com/use/hk1XqN9c6Lf3fny61cgEOLQb3L_J71xc5h2WpNu9MmP
-# price drop key = hk1XqN9c6Lf3fny61cgEOLQb3L_J71xc5h2WpNu9MmP
-# average drop url =https://maker.ifttt.com/use/hk1XqN9c6Lf3fny61cgEOMkLhEGT8CNupRK-3l5KgWy
-# average drop key = hk1XqN9c6Lf3fny61cgEOMkLhEGT8CNupRK-3l5KgWy
-
 # Import packages
+import os
 import requests
 import time
+from dotenv import load_dotenv
 
-# API Key = YO4LSAY68E6AI3BB
-api_key = 'YO4LSAY68E6AI3BB'
+# Load environment variables from .env file
+load_dotenv()
+
+FINANCIAL_MODELING_PREP_API_KEY = os.getenv('FINANCIAL_MODELING_PREP_API_KEY')
+PRICE_DROP_KEY = os.getenv('PRICE_DROP_KEY')
+AVERAGE_DROP_KEY = os.getenv('AVERAGE_DROP_KEY')
 
 # Replace with your IFTTT Webhooks keys and event names
-price_drop_key = 'YOUR_PRICE_DROP_WEBHOOKS_KEY'
+price_drop_key = 'hk1XqN9c6Lf3fny61cgEOLQb3L_J71xc5h2WpNu9MmP'
 price_drop_event = 'sp_25p_alert' 
-average_drop_key = 'YOUR_AVERAGE_DROP_WEBHOOKS_KEY'
+average_drop_key = 'hk1XqN9c6Lf3fny61cgEOMkLhEGT8CNupRK-3l5KgWy'
 average_drop_event = 'sp_7da_alert'
 
 # Define a list of stock symbols you want to monitor
-stock_symbols = ["TSLA, AAPL,  GOOGL, MSFT, NKE"]
+stock_symbols = ["TSLA", "AAPL", "GOOGL", "MSFT", "NKE"]
 
-# Initialize dictionaries to store data
+# Dictionaries to store data
 last_prices = {}
 seven_day_averages = {}
 
+# Define the max number of API calls before stopping
+max_api_calls = 1  # Change this to your desired limit
+
+# Counter to keep track of API calls
+api_call_count = 0
+
 def send_webhook_alert(event_key, event_name, message):
-    # Send a webhook alert using the provided key and event name
+    # Send a webhook alert
     url = f'https://maker.ifttt.com/trigger/{event_name}/with/key/{event_key}'
     data = {'value1': message}
     response = requests.post(url, json=data)
@@ -35,15 +42,15 @@ def send_webhook_alert(event_key, event_name, message):
 
 def fetch_stock_data(symbol):
     try:
-        # Fetch intraday data
-        intraday_url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=1min&apikey=YOUR_API_KEY'
+        # Fetch intraday data - fix .env ->
+        intraday_url = 'https://financialmodelingprep.com/api/v3/quote-short/AAPL,GOOGL,TSLA,MSFT,NKE?apikey=151bf0b888c3544b249779155b5233a9'
         intraday_data = requests.get(intraday_url).json()
         latest_prices = intraday_data['Time Series (1min)']
         latest_time = list(latest_prices.keys())[0]
         latest_price = float(latest_prices[latest_time]['4. close'])
 
-        # Fetch daily data
-        daily_url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey=YOUR_API_KEY'
+        # Fetch daily data - fix .env ->
+        daily_url = 'https://financialmodelingprep.com/api/v3/historical-price-full/AAPL,GOOGL,TSLA,MSFT,NKE?serietype=line&apikey=151bf0b888c3544b249779155b5233a9'
         daily_data = requests.get(daily_url).json()
         daily_prices = daily_data['Time Series (Daily)']
 
@@ -87,8 +94,11 @@ while True:
                 # Print stock data
                 print(f"{symbol}: £{latest_price:.2f} (7-Day Avg: £{seven_day_average:.2f})")
 
+        # API call count (useful for accounts with call limit)
+        api_call_count += 1
+
         # Sleep for a few seconds before fetching data again
-        time.sleep(10)  # You can adjust the interval as needed
+        time.sleep(6000)  # Adjust the interval as needed
 
     except KeyboardInterrupt:
         print("Monitoring stopped by user.")
