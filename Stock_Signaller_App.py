@@ -4,7 +4,7 @@ import requests
 import time
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables from .env file 
 load_dotenv()
 
 FINANCIAL_MODELING_PREP_API_KEY = os.getenv('FINANCIAL_MODELING_PREP_API_KEY')
