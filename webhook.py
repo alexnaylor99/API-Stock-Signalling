@@ -2,14 +2,18 @@ import requests
 
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
 
 def send_ifttt_webhook(event, symbol, current_price, previous_price):
     webhook_key = os.getenv("WEBHOOK_KEY")
-    url = f"https://maker.ifttt.com/trigger/{event}/with/key/{webhook_key}"
-    payload = {"value1": symbol, "value2": current_price, "value3": previous_price}
-    print(f"Sending payload: {payload}")
-    response = requests.post(url, json=payload)
-    print(f"Received response: {response.text}")
+    url = f"https://maker.ifttt.com/trigger/{event}/json/with/key/{webhook_key}"
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "symbol": symbol,
+        "previous_price": str(previous_price),
+        "current_price": str(current_price),
+    }
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
