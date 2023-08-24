@@ -2,8 +2,4 @@ venv/
 
 .env
 
-draft.py
-# test.py
-
-data.txt
 __pycache__

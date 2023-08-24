@@ -3,7 +3,8 @@ import time
 from json.decoder import JSONDecodeError
 import os
 from dotenv import load_dotenv
-from collections import deque
+from webhook import send_price_drop, send_avg_price_drop
+
 
 load_dotenv()
 
@@ -13,19 +14,10 @@ class StockInfo:
         self.symbol = symbol
         self.current_price = None
         self.previous_price = None
-        self.seven_day_prices = deque(maxlen=7)
 
     def update_price(self, new_price):
         self.previous_price = self.current_price
         self.current_price = new_price
-
-    def update_seven_day_prices(self, daily_average):
-        self.seven_day_prices.append(daily_average)
-
-    def calculate_seven_day_average(self):
-        if len(self.seven_day_prices) == 0:
-            return None
-        return sum(self.seven_day_prices) / len(self.seven_day_prices)
 
     def check_price_fall(self):
         if self.current_price and self.previous_price:
@@ -33,16 +25,23 @@ class StockInfo:
                 print(
                     f"ALERT: {self.symbol} has fallen by at least £0.25 GBP. Current price is ${self.current_price}. Time to buy!"
                 )
+                send_price_drop(
+                    "stock_price_fell",
+                    self.symbol,
+                    self.current_price,
+                    self.previous_price,
+                )
 
-    def check_below_seven_day_avg(self):
-        seven_day_avg = self.calculate_seven_day_average()
-        if (
-            seven_day_avg is not None
-            and self.current_price is not None
-            and self.current_price < seven_day_avg
-        ):
+    def check_below_seven_day_avg(self, daily_avg):
+        if self.current_price < daily_avg:
             print(
-                f"ALERT: {self.symbol}'s current price of ${self.current_price} is below the 7-day average of ${seven_day_avg}. Consider buying!"
+                f"ALERT: {self.symbol}'s current price of ${self.current_price} is below the 7-day average of ${daily_avg}. Consider buying!"
+            )
+            send_avg_price_drop(
+                "stock_price_fell",
+                self.symbol,
+                self.current_price,
+                daily_avg,
             )
 
 
@@ -85,14 +84,12 @@ if __name__ == "__main__":
     while True:
         for stock_info in monitored_stocks:
             new_price = get_stock_price(stock_info.symbol, api_token)
-            daily_avg = get_daily_average_price(stock_info.symbol, api_token)
 
             if new_price is not None:
                 stock_info.update_price(new_price)
-                if daily_avg is not None:
-                    stock_info.update_seven_day_prices(daily_avg)
-
                 stock_info.check_price_fall()
-                stock_info.check_below_seven_day_avg()
+
+                daily_avg = get_daily_average_price(stock_info.symbol, api_token)
+                stock_info.check_below_seven_day_avg(daily_avg)
 
         time.sleep(60 * 5)  # Sleep for 5 minutes
