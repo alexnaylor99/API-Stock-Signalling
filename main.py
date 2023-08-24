@@ -1,63 +1,63 @@
 import requests
 import time
+import os
 
-#Twelve Data API Key
-API_KEY = "2f20ea0a2f9b4a27bd2cd6b2464d6d60"
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.getenv('API_KEY')
+
+WEBHOOKS_KEY = os.getenv('WEBHOOKS_KEY')
 
 
-WEBHOOKS_KEY = "b-gntgVdhCa1F8DgkWXRvT"
+
+IFTTT_URL = f"https://maker.ifttt.com/trigger/notify/with/key/{WEBHOOKS_KEY}"
 
 
-PRICE_FALL_THRESHOLD = 0.25
+
+PRICE_DROP_THRESHOLD = 0.25
+
+stock_symbols = ["AAPL", "GOOGL", "MSFT" , "NKE", "TSLA"]
+
+previous_prices = {}
 
 
 
 #function that returns latest stock prices
 def get_stock_price(symbol):
-    
-    params = {
-        "symbol": symbol,
-        "apikey": API_KEY
-    }
-
-    response = requests.get("https://api.twelvedata.com/price", params=params)
+    url = f"https://cloud.iexapis.com/stable/stock/{symbol}/quote?token={API_KEY}"
+    response = requests.get(url)
     data = response.json()
+    return data['latestPrice']
 
-    if "price" in data:
-        return float(data["price"])
-
-    else:
-        return None
 
 #function that sends IFTTT notification
-
-def send_notification(stock_symbol, price):
-    ifttt_url = "https://maker.ifttt.com/trigger/notify/json/with/key/b-gntgVdhCa1F8DgkWXRvT"
-
-    data = {
-        "value1" : stock_symbol,
-        "value2" : price
+def send_notification(symbol, price):
+    
+    payload = {
+        "value1" : symbol,
+        "value2" : str(price)
     }
 
-    response = requests.post(ifttt_url, json=data)
-
-    if response.status_code == 200:
-        print(f"Notification has been sent for {stock_symbol}.")
-    
-    else:
-        print(f"Failed to send notification for {stock_symbol}.")
-
-
+    requests.post(IFTTT_URL, json=payload)
+  
     
 
 if __name__ == "__main__":
-    stock_symbols = ["AAPL", "GOOGL", "MSFT" , "NKE", "TSLA"]
+    while True:
+        try:
+            for symbol in stock_symbols:
+                current_stock_price = get_stock_price(symbol)
+                print(f"The latest price of {symbol} is {current_stock_price:} GBP")
 
-    for symbol in stock_symbols:
-        current_stock_price = get_stock_price(symbol)
+                if current_stock_price <= (get_stock_price(symbol) - PRICE_DROP_THRESHOLD):
+                    send_notification(symbol, current_stock_price)
+                    print(f"{symbol} price dropped by at least £0.25 GBP.")
 
-        if current_stock_price is not None:
-            print(f"The latest price of {symbol} is ${current_stock_price:.2f}")
+              
+            
+            time.sleep(300)
         
-        else:
-            print(f"Couldn't retrieve latest price for {symbol}")
+        except Exception as e:
+            print("ERROR!", e)
