@@ -6,25 +6,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv('API_KEY')
+API_KEY = os.getenv('API_KEY') #IEX CLOUD API
 
-WEBHOOKS_KEY = os.getenv('WEBHOOKS_KEY')
-
-
-
-IFTTT_URL = f"https://maker.ifttt.com/trigger/notify/with/key/{WEBHOOKS_KEY}"
+WEBHOOKS_KEY = os.getenv('WEBHOOKS_KEY') #WEBHOOKS KEY
 
 
 
-PRICE_DROP_THRESHOLD = 0.25
+IFTTT_URL = f"https://maker.ifttt.com/trigger/notify/with/key/{WEBHOOKS_KEY}" #IFTTT URL
+
+
+
+PRICE_DROP_THRESHOLD = 0.25 #THRESHOLD FOR PRICE DROP
 
 stock_symbols = ["AAPL", "GOOGL", "MSFT" , "NKE", "TSLA"]
 
-previous_prices = {}
 
 
-
-#function that returns latest stock prices
+#FUNCTION THAT RETURNS LATEST PRICE STOCKS
 def get_stock_price(symbol):
     url = f"https://cloud.iexapis.com/stable/stock/{symbol}/quote?token={API_KEY}"
     response = requests.get(url)
@@ -32,7 +30,7 @@ def get_stock_price(symbol):
     return data['latestPrice']
 
 
-#function that sends IFTTT notification
+#FUNCTION THAT SENDS IFTTT NOTIFICATION
 def send_notification(symbol, price):
     
     payload = {
@@ -57,7 +55,7 @@ if __name__ == "__main__":
 
               
             
-            time.sleep(300)
+            time.sleep(300) #CHECKING PRICE AGAIN EVERY FIVE MINS
         
         except Exception as e:
-            print("ERROR!", e)
+            print("AN ERROR OCCURED!", e)
