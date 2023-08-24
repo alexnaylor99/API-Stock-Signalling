@@ -15,10 +15,12 @@ class StockInfo:
         self.current_price = None
         self.previous_price = None
 
+    # Update the current and previous stock prices
     def update_price(self, new_price):
         self.previous_price = self.current_price
         self.current_price = new_price
 
+    # Check if the stock price has fallen by at least $0.25 GBP and send alert
     def check_price_fall(self):
         if self.current_price and self.previous_price:
             if self.current_price < self.previous_price - 0.25:
@@ -32,6 +34,7 @@ class StockInfo:
                     self.previous_price,
                 )
 
+    # Check if current stock price is below its 7-day average and send alert
     def check_below_seven_day_avg(self, daily_avg):
         if self.current_price < daily_avg:
             print(
@@ -45,6 +48,7 @@ class StockInfo:
             )
 
 
+# Fetch current stock price from FMP API
 def get_stock_price(symbol, api_token):
     url = f"https://financialmodelingprep.com/api/v3/quote/{symbol}?apikey={api_token}"
     response = requests.get(url)
@@ -57,6 +61,7 @@ def get_stock_price(symbol, api_token):
             return None
 
 
+# Fetch 7-day average stock price from FMP API
 def get_daily_average_price(symbol, api_token):
     url = f"https://financialmodelingprep.com/api/v3/historical-price-full/{symbol}?timeseries=7&apikey={api_token}"
     response = requests.get(url)
@@ -73,6 +78,7 @@ def get_daily_average_price(symbol, api_token):
 if __name__ == "__main__":
     api_token = os.getenv("API_KEY")
 
+    # List of stocks to be monitored
     monitored_stocks = [
         StockInfo("TSLA"),
         StockInfo("AAPL"),
@@ -81,6 +87,7 @@ if __name__ == "__main__":
         StockInfo("NKE"),
     ]
 
+    # Main loop for monitoring stock prices
     while True:
         for stock_info in monitored_stocks:
             new_price = get_stock_price(stock_info.symbol, api_token)
