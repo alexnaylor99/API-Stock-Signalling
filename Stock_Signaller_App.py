@@ -1,20 +1,20 @@
 # Import packages
-import os
+# import os
 import requests
 import time
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 # Load environment variables from .env file 
-load_dotenv()
+# load_dotenv()
 
-FINANCIAL_MODELING_PREP_API_KEY = os.getenv('FINANCIAL_MODELING_PREP_API_KEY')
-PRICE_DROP_KEY = os.getenv('PRICE_DROP_KEY')
-AVERAGE_DROP_KEY = os.getenv('AVERAGE_DROP_KEY')
+# API_KEY = os.environ['API_KEY']
+# PRICE_DROP_KEY = os.environ['PRICE_DROP_KEY']
+# average_drop_key = os.environ['AVERAGE_DROP_KEY']
 
 # Replace with your IFTTT Webhooks keys and event names
 price_drop_key = 'hk1XqN9c6Lf3fny61cgEOLQb3L_J71xc5h2WpNu9MmP'
 price_drop_event = 'sp_25p_alert' 
-average_drop_key = 'hk1XqN9c6Lf3fny61cgEOMkLhEGT8CNupRK-3l5KgWy'
+# average_drop_key="hk1XqN9c6Lf3fny61cgEOMkLhEGT8CNupRK-3l5KgWy"
 average_drop_event = 'sp_7da_alert'
 
 # Define a list of stock symbols you want to monitor
@@ -32,9 +32,9 @@ api_call_count = 0
 
 def send_webhook_alert(event_key, event_name, message):
     # Send a webhook alert
-    url = f'https://maker.ifttt.com/trigger/{event_name}/with/key/{event_key}'
-    data = {'value1': message}
-    response = requests.post(url, json=data)
+    url = f'https://maker.ifttt.com/trigger/{event_name}/with/key/hk1XqN9c6Lf3fny61cgEOMkLhEGT8CNupRK-3l5KgWy'
+    playload = {'value1': message}
+    response = requests.post(url, data=playload)
     if response.status_code == 200:
         print(f"Alert sent successfully to {event_name}.")
     else:
@@ -45,18 +45,21 @@ def fetch_stock_data(symbol):
         # Fetch intraday data - fix .env ->
         intraday_url = 'https://financialmodelingprep.com/api/v3/quote-short/AAPL,GOOGL,TSLA,MSFT,NKE?apikey=151bf0b888c3544b249779155b5233a9'
         intraday_data = requests.get(intraday_url).json()
-        latest_prices = intraday_data['Time Series (1min)']
-        latest_time = list(latest_prices.keys())[0]
-        latest_price = float(latest_prices[latest_time]['4. close'])
+        for element in intraday_data:
+            print('Here is the real time stock price for: ' f"{element['symbol']}: {element['price']}")
+  
 
         # Fetch daily data - fix .env ->
         daily_url = 'https://financialmodelingprep.com/api/v3/historical-price-full/AAPL,GOOGL,TSLA,MSFT,NKE?serietype=line&apikey=151bf0b888c3544b249779155b5233a9'
         daily_data = requests.get(daily_url).json()
-        daily_prices = daily_data['Time Series (Daily)']
-
+        daily_prices = daily_data['historicalStockList']
+        
         # Calculate the 7-day average
-        daily_prices_list = [float(daily_prices[date]['4. close']) for date in list(daily_prices.keys())[:7]]
+        # daily_prices_list = [float(daily_prices[date]['4. close']) for date in list(daily_prices.keys())[:7]]
+        daily_prices_list = [float(entry["close"]) for entry in daily_data["historicalStockList"][0]["historical"]]
         seven_day_average = sum(daily_prices_list) / len(daily_prices_list)
+        for element in seven_day_average:
+            print('Here is the seven-day average stock price for: ' f"{element['symbol']}: {element['seven_day_average']}")
 
         return latest_price, seven_day_average
 
@@ -69,6 +72,8 @@ def fetch_stock_data(symbol):
         # Handle other exceptions
         print(f"An error occurred while fetching data for {symbol}: {str(e)}")
         return None, None
+
+
 
 while True:
     try:
