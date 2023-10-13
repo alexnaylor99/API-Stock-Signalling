@@ -2,7 +2,7 @@ import requests
 
 
 # List ofstock symbols that will be monitored
-stock_symbols = {"TSLA":0, "AAPL":0, "MSFT":0, "GOOGL":0, "NKE":0}
+stock_symbols = ["TSLA", "AAPL", "MSFT", "GOOGL", "NKE"]
 
 # API key and the base URL
 alpha_vantage_api_key = "NZXLRSMAPCX4T3YW"
@@ -31,7 +31,8 @@ def get_stock_price(symbol):
 
 
 def send_notification(stock_symbol, stock_price, previous_price):
-    if  previous_price - stock_price >= 0.25:
+   # Check if the price decreased by at least £0.25  
+   if  previous_price - stock_price >= 0.25:
         message = f"{stock_symbol} price decreased by £0.25: {stock_price}"
         data = {
             "value1": message
