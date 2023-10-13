@@ -1,40 +1,57 @@
-# API-Stock-Signalling
-###### NOTE: this is a project to practice your Python industry skills. Please upload your solutions by opening a new branch to the main. All files that are instantly merged to the main will be deleted. 
-## Overview
-A small consultancy who is currently delivering client work for a major bank wants to monitor the prices for the following stocks: Tesla, Apple, Microsoft, Google, and Nike. Once the stock falls below a certain price, they want to be immediately notified so that they can purchase more stocks. 
-## Goal
-Write a real time Python application that monitors the prices then notifies the user when the price of any of these stocks falls by at least £0.25 GBP. The user should also be notified if today's price is less than the 7-day average of that stock price.
-## Brief
-To do this, the client has recommended using a popular automation website called IFTTT: https://ifttt.com/. They are willing to use a different provider or solution (use those consultancy skills!) if you believe there is a better option.
-#### IFTTT Applet
+# First things first
+1. "AAPL", "MSFT", "GOOGL", "TSLA", "NKE" and 0.25 are default settings for companies and drop level. You can change those at your own discretion.  
+2. Create .env file locating it in your current working directory
+3. Make sure .gitignore has .env
+4. Inside .env set your email details: 
 
-IFTTT stands for “If This Then That” and it’s an automation platform that allows you to connect different apps and services together. An applet is a connection between two or more apps or devices that enables you to do something that those services couldn’t do on their own. Applets consists of two parts triggers and actions. Triggers tell an applet to start, and actions are the end result of an applet run. To use an applet, you’ll need to create a free IFTTT account and connect your apps and devices to IFTTT so that they can talk to each other.
+EMAIL_USER=here_is_your_gmail_account@gmail.com
+RECEIVER_EMAIL=here_is_your_gmail_account@gmail.com
+EMAIL_PASS=here past your pass (see below)
 
-#### Proposed Workflow
-- Write a script that returns the stock prices. This will involve making an API request.
-- Set up a IFTTT account and applet. This will be accessible via the mobile app which allows you to trigger the webhook service provided by IFTTT.
-- You will need to configure the 'webhooks' service to receive web requests. You can find more details here: https://ifttt.com/maker_webhooks. 
-- From here you can write an application that utilises the requests package to make POST and GET requests.
-- Think of what aspects or components of your proposed solution needs to be tested and what would these tests look like and attempt to implement such tests.
+5. Proceed with adding password inside .env following the procedure below
 
-## Main Considerations
-- Choose an automation approach. Are you planning on using IFTTT or another workflow?
-- What API are you going to use? You can use this as a starting point: https://github.com/public-apis/public-apis
-- Remember, this is a proposed workflow. If you believe you have a more efficient approach please reach out to the Academy Team.
-#### Requirements Gathering
-The start to any project is to make sure you have clear and well-defined requirements for your project. Most projects start with a vague idea of what the stakeholder wants, and as a consultant, we will never have as much knowledge about their problem/business context as they do. Therefore, we need to get as much information out of them as possible, as they will subconsciously assume that we know everything. For this project, Alex Naylor will be the stakeholder.
+# Create & use app passwords
 
-If you don't know the answer to any question then you should always ask - NEVER ASSUME. This will only risk the accuracy of your work and end up having to do everything all over again if you wrongly assume.
+To help keep your account secure, use "Sign in with Google" to connect apps to your Google Account
 
-Questions to ask yourself constantly throughout the project are:
+1. Go to your Google Account.
+2. Select Security.
+3. Under "How you sign in to Google," select 2-Step Verification.
+4. At the bottom of the page, select App passwords.
+5. Enter a name that helps you remember where you’ll use the app password.
+6. Select Generate and follow the instructions on your screen. The app password is the 16-character code that generates on your device.
 
-- What is the purpose of this project, why does the stakeholder want this and what is the desired outcome of the project?
-- Is there any extra info that the stakeholder could tell you to help tailor the project to what they want?
+Paste it in .env file replacing here past your pass with whatever 16-character you got:
 
-## Assessment
-For the assessment, you will have a 15 minute technical interview. This will consist of a strict 5 minute presentation on your technical solution. There is no need to create slides for this but you may want to demo your code. For the second half of the session, you will be asked technical questions related to the project. You will be assessed on: 
-- Project Complexity
-- Brief Completness i.e. have you managed to meet the client brief?
-- Coding Standards
+EMAIL_PASS=here past your pass
 
-Good Luck!
+# Stock exchange working hours
+Our example is looking at "AAPL", "MSFT", "GOOGL", "TSLA", "NKE", which are listed in US. Since stock exchange is not trading 24/7, our watcher will see no change during closed time. 
+You could replace the tickers with any other companies listed at Stock Exchanges located in working time zones, just double-check at Yahoo finance the ticker is correct.
+
+
+# Why smtplib over IFTTT
+Following YAGNI principle we believe the requirement of sending notification via email provides exactly what we need. For this task smtplib offers more direct and controllable solution, also it is free.
+
+Considering further versions, IFTTT would be chosen for additional web notification solutions, such as Facebook, Telegram, SMS etc. 
+
+# Why yfinance over API
+yfinance is a library for fetching market data from Yahoo Finance. It provides a simpler interface for fetching stock data compared to making HTTP requests to an API, parsing the responses, and handling errors. 
+
+Given that we are planning to run the script every minute, this would total to a max of 1,440 requests per day (assuming one request per run). This falls well within the documented rate limits for the public API based on IP address (48,000 requests per day)
+
+# Create & use app passwords
+
+To help keep your account secure, use "Sign in with Google" to connect apps to your Google Account
+
+1. Go to your Google Account.
+2. Select Security.
+3. Under "Signing in to Google," select 2-Step Verification.
+4. At the bottom of the page, select App passwords.
+5. Enter a name that helps you remember where you’ll use the app password.
+6. Select Generate and follow the instructions on your screen. The app password is the 16-character code that generates on your device.
+
+Paste it in .env file replacing here past your pass with whatever 16-character you got:
+EMAIL_PASS=here past your pass
+
+"AAPL", "MSFT", "GOOGL", "TSLA", "NKE"
