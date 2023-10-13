@@ -29,6 +29,7 @@ def main():
     previous_price = None
     current_price = None
 
+    # Getting new current price, updating previous price and seven day average
     while True:
         for stock in ticker_symbol:
             previous_price = ticker_symbol[stock]
