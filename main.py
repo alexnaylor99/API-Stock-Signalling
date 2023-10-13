@@ -39,7 +39,7 @@ def main():
 
         price_difference = previous_price - current_price
 
-        if price_difference >= 0.25 or current_price < seven_day_average:
+        if price_difference >= 0.30 or current_price < seven_day_average:
             # Trigger IFTTT applet using Webhooks service
             payload = {'value1': current_price, 'value2': seven_day_average}
             requests.post(f'https://maker.ifttt.com/trigger/{IFTTT_EVENT_NAME}/json/with/key/{IFTTT_KEY}', json=payload)
