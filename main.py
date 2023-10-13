@@ -43,9 +43,7 @@ def main():
             payload = {'value1': current_price, 'value2': seven_day_average}
             requests.post(f'https://maker.ifttt.com/trigger/{IFTTT_EVENT_NAME}/json/with/key/{IFTTT_KEY}', json=payload)
         
-        payload = {'value1': current_price, 'value2': seven_day_average}
-        requests.post(f'https://maker.ifttt.com/trigger/{IFTTT_EVENT_NAME}/json/with/key/{IFTTT_KEY}', json=payload)
-
+    
         previous_price = current_price
         # Check every 5 minutes
         time.sleep(300)  
