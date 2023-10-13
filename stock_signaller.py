@@ -113,4 +113,7 @@ if __name__ == "__main__":
     for stock in stocks_to_check:
         check_and_notify(stock)
 
+# stocks_to_check = ['MSFT', 'GOOGL', 'AAPL', 'NKE', 'TSLA']
+
+
 
