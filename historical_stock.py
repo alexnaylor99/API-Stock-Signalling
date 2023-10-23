@@ -11,7 +11,7 @@ def get_data_request(ticker):
     Then, it makes sure to only take 5 records and returns the final dictionary.
     """
     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&
-            symbol={ticker}&outputsize=compact&apikey=demoY22ZX8DF9C8MCNWW"
+            symbol={ticker}&outputsize=compact&apikey=demo{api-key}"
     response_for_historical = requests.get(url)
     if response_for_historical.status_code == 200:
         data = response_for_historical.json()
