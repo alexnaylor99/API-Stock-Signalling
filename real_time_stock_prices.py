@@ -7,7 +7,7 @@ def get_dataset(ticker):
     then returns a dictionary data structure 
     """
     print("Running dataset")
-    response_for_realtime = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={ticker}&interval=1min&outputsize=compact&apikey=O3KE4N17RB5IPQOD")
+    response_for_realtime = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={ticker}&interval=1min&outputsize=compact&apikey={api-key}")
     if response_for_realtime.status_code == 200:
         data = response_for_realtime.json()
         print(data)
@@ -97,7 +97,7 @@ def main():
     The main calls all the functions above and communicates with the IFTTT so it can email
     any updates about the stocks when triggered.
     """
-    api_key = "nmSjoGFt5z5ExJ4bLUMBcr0JozQykoHC2TB5dUNdUT4"
+    api_key = "api"
     event_name = "stock_update"
     url = f"https://maker.ifttt.com/trigger/{event_name}/with/key/{api_key}"
 
