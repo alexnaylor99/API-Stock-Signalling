@@ -4,7 +4,7 @@ import time
 import pandas as pd
 
 IFTTT_EVENT_NAME = 'stock_has_dropped'
-IFTTT_KEY = 'b8wRX9xgqi7o9u43AAlmwA'
+IFTTT_KEY = ''
 
 # Calculate the 7-day average of stock prices
 def calculate_7_day_average(ticker_symbol):
